@@ -1,0 +1,137 @@
+create schema project_domestic_cricket;
+set search_path to project_domestic_cricket;
+
+create table Venue(
+Stadium_Name VARCHAR(40) primary key,
+City VARCHAR(20)
+);
+
+create table Team(
+Team_Name varchar(40) primary key ,
+Homeground varchar(40),
+FOREIGN KEY (Homeground)references Venue(Stadium_Name)
+ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+create table Coach(
+Coach_ID varchar(3) primary key,
+C_Name varchar(30) NOT NULL,
+Team_Name varchar(40) NOT NULL,
+Experience INT NOT NULL,
+Coach_Type VARCHAR(10) NOT NULL,
+FOREIGN KEY(Team_Name) references Team(Team_Name)
+ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+create table Player(
+Player_ID integer primary key,
+P_Name varchar(35) NOT NULL,
+Team_Name varchar(40) NOT NULL,
+DOB date NOT NULL,
+Category varchar(15) NOT NULL,
+Batting_Style varchar(3),
+Bowling_Style varchar(40),
+FOREIGN KEY(Team_Name) references Team(Team_Name) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+create table Umpire(
+U_ID varchar(3) primary key,
+U_name varchar(20) NOT NULL,
+Experience integer
+);
+
+CREATE TABLE Tournament(
+Tour_Name VARCHAR(50),
+YEAR INT,
+Best_batsman INT,
+Best_bowler INT,
+Player_of_the_tournament INT,
+Winner VARCHAR(40),
+Runner_Up VARCHAR(40),
+primary key (Tour_Name , YEAR)
+foreign key(Best_batsman) references Player(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign key(Best_bowler) references Player(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign key(Player_of_the_tournament) references Player(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE Participated_In(
+Team_Name VARCHAR(40),
+Tour_Name VARCHAR(50),
+YEAR INT,
+Caption_ID INT,
+primary key(Team_Name,Tour_Name,YEAR),
+foreign KEY(Team_Name) references Team(Team_Name) ON UPDATE CASCADE ON DELETE CASCADE ,
+foreign KEY(Tour_Name,YEAR) references Tournament(Tour_Name,YEAR) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign key (Caption_ID)references Player(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE Matches(
+Match_ID VARCHAR(4) primary key,
+T1_Name VARCHAR(40),
+T2_Name VARCHAR(40),
+date_of_match date,
+Toss VARCHAR(40),
+Elects VARCHAR(10),
+Result VARCHAR(40),
+Stadium_Name VARCHAR(40),
+MOM INT,
+Tour_Name VARCHAR(50),
+YEAR INT,
+foreign KEY(Tour_Name,YEAR) references Tournament(Tour_Name,YEAR) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign KEY(Stadium_Name) references Venue(Stadium_Name) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign key (T2_Name)references Team(Team_Name) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign key (T1_Name)references Team(Team_Name) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign key (MOM)references Player(Player_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE Umpired_By(
+Match_ID VARCHAR(4),
+U_ID VARCHAR(3),
+primary key(Match_ID,U_ID),
+foreign key (Match_ID) references Matches(Match_ID) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign key (U_ID) references Umpire(U_ID) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE Plays(
+Team_Name VARCHAR(40),
+Match_ID VARCHAR(4),
+primary key(Team_Name , Match_ID),
+foreign key (Team_name) references Team(Team_Name) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign key (Match_ID) references Matches(Match_ID) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE Team_info(
+Team_Name VARCHAR(40),
+Match_ID VARCHAR(4),
+Playing_XI INT,
+primary key(Team_Name , Match_ID,Playing_XI),
+foreign key (Team_name) references Team(Team_Name) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign key (Match_ID) references Matches(Match_ID) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign key (Playing_XI)references Player(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE Batting_Scorecard(
+Match_ID VARCHAR(4),
+Player_ID INT,
+Balls_Faced INT,
+Runs INT,
+Notout bool,
+primary key(Match_ID,Player_ID),
+foreign key (Match_ID) references Matches(Match_ID) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign key (Player_ID) references Player(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE Bowling_Scorecard(
+Match_ID VARCHAR(4),
+Player_ID INT,
+Balls_delivered INT,
+Runs_conceeded INT,
+Wickets INT,
+Wides INT,
+No_balls INT,
+Lbs_or_Byes INT,
+primary key(Match_ID,Player_ID),
+foreign key (Match_ID) references Matches(Match_ID) ON UPDATE CASCADE ON DELETE CASCADE,
+foreign key (Player_ID) references Player(Player_ID) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
